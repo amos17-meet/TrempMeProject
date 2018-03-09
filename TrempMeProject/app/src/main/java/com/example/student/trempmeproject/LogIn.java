@@ -1,46 +1,45 @@
 package com.example.student.trempmeproject;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class LogIn extends AppCompatActivity implements View.OnClickListener {
     EditText tvUserName, tvPassword;
     Button btnSubmit, btnGoToSignUp;
 
-    private final int RESULT_LOG_IN=0;
-    private final int RESULT_SIGN_UP=1;
+    SQLiteHelper dbHelper;
+    SQLiteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log_in);
-
         onSubmitclicked();
         goToSignUp();
+        openDatabase();
+    }
 
+    private void openDatabase(){
+        dbHelper=new SQLiteHelper(this);
+        db=dbHelper.getWritableDatabase();
     }
 
     public void onSubmitclicked(){
         tvUserName=(EditText)findViewById(R.id.et_user_name);
-        tvPassword=(EditText)findViewById(R.id.et_address);
+        tvPassword=(EditText)findViewById(R.id.et_password);
         btnSubmit=(Button)findViewById(R.id.btn_submit);
 
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.putExtra("Username", tvUserName.getText().toString());
-                intent.putExtra("Password", tvPassword.getText().toString());
-                setResult(RESULT_LOG_IN, intent);
-                finish();
-            }
-        });
+        btnSubmit.setOnClickListener(this);
     }
+
 
     public void goToSignUp(){
         btnGoToSignUp=(Button) findViewById(R.id.btn_to_sign_up);
@@ -49,8 +48,24 @@ public class LogIn extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        Intent intent=new Intent(this,SignUp.class);
-        startActivityForResult(intent,0);
+        if(view==btnGoToSignUp){
+                Intent intent=new Intent(this,SignUp.class);
+                startActivityForResult(intent,0);
+        }
+        if (view==btnSubmit){
+
+            int id=dbHelper.matchUsernameToPassword(db,tvUserName.getText().toString(),tvPassword.getText().toString());
+            if(id!=-1){
+                Intent intent = new Intent();
+                intent.putExtra("id", id+"");
+                setResult(RESULT_OK, intent);
+                finish();
+            }else{
+                Toast.makeText(this,"Uncurrect Username Or Password",Toast.LENGTH_LONG).show();
+            }
+
+        }
+
     }
 
     @Override
@@ -60,12 +75,8 @@ public class LogIn extends AppCompatActivity implements View.OnClickListener {
         if(requestCode==0){
             if(resultCode==RESULT_OK){
                 Intent intent =new Intent();
-                intent.putExtra("newUsername", data.getStringExtra("newUsername"));
-                intent.putExtra("newPassword", data.getStringExtra("newPassword"));
-                intent.putExtra("newAddress", data.getStringExtra("newAddress"));
-                intent.putExtra("newStringHasLicence", data.getStringExtra("newStringHasLicence"));
-                intent.putExtra("newImg",data.getByteArrayExtra("newImg"));
-                setResult(RESULT_SIGN_UP,intent);
+                intent.putExtra("id", data.getStringExtra("id"));
+                setResult(RESULT_OK,intent);
                 finish();
             }
         }

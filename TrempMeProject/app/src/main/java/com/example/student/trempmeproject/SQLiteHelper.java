@@ -12,20 +12,20 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "DBName";
     private static final int DATABASE_VERSION = 4;
 
-    public static final String TREMPIST_TABLE = "tbl_trempist";
+    private static final String TREMPIST_TABLE = "tbl_trempist";
 
-    public static final String ID_COLUMN = "id";
+    private static final String ID_COLUMN = "id";
 
-    public static final String USER_NAME_COLUMN="user_name";
-    public static final String DRIVING_LICENCE_COLUMN="driving_licence";
-    public static final String ADDRESS_COLUMN="address";
-    public static final String PASSWORD_COLUMN="password";
-    public static final String IMAGE_COLUMN="image";
+    private static final String USER_NAME_COLUMN="user_name";
+    private static final String DRIVING_LICENCE_COLUMN="driving_licence";
+    private static final String ADDRESS_COLUMN="address";
+    private static final String PASSWORD_COLUMN="password";
+    private static final String IMAGE_COLUMN="image";
 
 
     private static final String[] cols=new String[]{ID_COLUMN,USER_NAME_COLUMN,DRIVING_LICENCE_COLUMN,ADDRESS_COLUMN,PASSWORD_COLUMN,IMAGE_COLUMN};
 
-    public static final String CREATE_TREMPIST_TABLE = "CREATE TABLE "
+    private static final String CREATE_TREMPIST_TABLE = "CREATE TABLE "
             + TREMPIST_TABLE + "(" + ID_COLUMN + " INTEGER PRIMARY KEY,"
             + USER_NAME_COLUMN + " TEXT, " + DRIVING_LICENCE_COLUMN + " INTEGER,"
             +ADDRESS_COLUMN+ " TEXT,"+PASSWORD_COLUMN+ " TEXT,"+IMAGE_COLUMN+" BLOB)";
@@ -50,7 +50,11 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
-    public int insert(SQLiteDatabase sqLiteDatabase, String userName, int drivingLicence, String address, String password, byte[] image){
+    public void deleteAll(SQLiteDatabase sqLiteDatabase){
+        sqLiteDatabase.delete(TREMPIST_TABLE, null, null);
+    }
+
+    public void insert(SQLiteDatabase sqLiteDatabase, String userName, int drivingLicence, String address, String password, byte[] image){
         ContentValues insertValues = new ContentValues();
         int newId=getNewId(getAll(sqLiteDatabase));
         insertValues.put(ID_COLUMN,newId);
@@ -60,7 +64,12 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         insertValues.put(PASSWORD_COLUMN,password);
         insertValues.put(IMAGE_COLUMN,image);
         sqLiteDatabase.insert(TREMPIST_TABLE,null,insertValues);
-        return newId;
+
+    }
+
+    public void deleteUser(SQLiteDatabase sqLiteDatabase,int id) {
+        String[] value=new String[]{id+""};
+        sqLiteDatabase.delete(TREMPIST_TABLE, ID_COLUMN+" LIKE ?",value );
     }
 
     public Cursor getAll(SQLiteDatabase sqLiteDatabase){
@@ -99,8 +108,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return c.getString(c.getColumnIndex(USER_NAME_COLUMN));
     }
 
-    public boolean hasDrivingLicence(Cursor c){
-        return c.getInt(c.getColumnIndex(DRIVING_LICENCE_COLUMN))==0;
+    public int hasDrivingLicence(Cursor c){
+        return c.getInt(c.getColumnIndex(DRIVING_LICENCE_COLUMN));
     }
 
     public String getRowAddress(Cursor c){
@@ -170,24 +179,62 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     public int matchUsernameToPassword( SQLiteDatabase sqLiteDatabase, String username, String password){
         Cursor userCursor=getQueryByUserName(sqLiteDatabase,username);
         Cursor passwordCursor=getQueryByPassword(sqLiteDatabase, password);
-        if(userCursor.getCount()==0||passwordCursor.getCount()==0)
+        if(userCursor.getCount()==0||passwordCursor.getCount()==0) {
+            Log.e("DEBAD", "match password to usernamr: no username or password that requested");
             return -1;
+        }
         else{
             while (!userCursor.isAfterLast()){
                 String userCursorPassword=getRowPassword(userCursor);
+                String userCursorUsername=getRowUserName(userCursor);
                 while (!passwordCursor.isAfterLast()){
                     String passwordCursorPassword=getRowPassword(passwordCursor);
-                    if(passwordCursorPassword.compareTo(userCursorPassword)==0)
-                        return getRowId(passwordCursor);
+                    String passwordCursorUsername=getRowUserName(passwordCursor);
+                    if(passwordCursorPassword.compareTo(userCursorPassword)==0) {
+                        if(userCursorUsername.compareTo(passwordCursorUsername)==0){
+                            return getRowId(passwordCursor);
+                        }
+                    }
                     passwordCursor.moveToNext();
                 }
                 userCursor.moveToNext();
             }
         }
-
-
-
         return -1;
+    }
+
+    public void setUserNameColumn(SQLiteDatabase sqLiteDatabase, String username, int userId){
+        ContentValues newValues = new ContentValues();
+        newValues.put(USER_NAME_COLUMN, username);
+        sqLiteDatabase.update(TREMPIST_TABLE, newValues, "id="+userId, null);
+    }
+
+    public void setAddressColumn(SQLiteDatabase sqLiteDatabase, String address, int userId){
+        ContentValues newValues = new ContentValues();
+        newValues.put(ADDRESS_COLUMN, address);
+
+        sqLiteDatabase.update(TREMPIST_TABLE, newValues, "id="+userId, null);
+    }
+
+    public void setDrivingLicenceColumn(SQLiteDatabase sqLiteDatabase, int hasDrivingLicence, int userId){
+        ContentValues newValues = new ContentValues();
+        newValues.put(DRIVING_LICENCE_COLUMN, hasDrivingLicence);
+
+        sqLiteDatabase.update(TREMPIST_TABLE, newValues, "id="+userId, null);
+    }
+
+    public void setPasswordColumn(SQLiteDatabase sqLiteDatabase, String password, int userId){
+        ContentValues newValues = new ContentValues();
+        newValues.put(PASSWORD_COLUMN, password);
+
+        sqLiteDatabase.update(TREMPIST_TABLE, newValues, "id="+userId, null);
+    }
+
+    public void setImgColumn(SQLiteDatabase sqLiteDatabase, byte [] img, int userId){
+        ContentValues newValues = new ContentValues();
+        newValues.put(IMAGE_COLUMN, img);
+
+        sqLiteDatabase.update(TREMPIST_TABLE, newValues, "id="+userId, null);
     }
 
 

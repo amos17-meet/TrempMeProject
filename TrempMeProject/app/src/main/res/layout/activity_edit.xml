@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:padding="10dp"
-    tools:context="com.example.student.trempmeproject.SignUp">
+    android:orientation="vertical"
+    tools:context="com.example.student.trempmeproject.EditActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="35sp"
-            android:text="SIGN UP HERE"/>
+            android:text="EDIT YOU'R DETAILS"/>
 
 
     </LinearLayout>
@@ -166,22 +166,31 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="10dp"
+                android:gravity="center">
 
                 <Button
                     android:id="@+id/btn_submit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Submit"
-                    android:textSize="25sp" />
+                    android:textSize="22sp" />
 
                 <Button
                     android:id="@+id/btn_cancle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="30dp"
                     android:text="Cancle"
-                    android:textSize="25sp" />
+                    android:textSize="22sp"
+                    />
+                <Button
+                    android:id="@+id/btn_delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Delete"
+                    android:textSize="22sp"
+                    />
+
 
             </LinearLayout>
         </LinearLayout>

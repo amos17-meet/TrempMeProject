@@ -1,6 +1,7 @@
 package com.example.student.trempmeproject;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -24,16 +25,20 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
     EditText userName, password, confirnPassword, address;
     Button takePhoto, submit, cancle;
     ImageView imgPhoto;
-    //Bitmap bitmap= BitmapFactory.decodeResource(this.getResources(), R.mipmap.user_base_img);
     Bitmap bitmap;
-    Boolean hasLicence;
+    //Bitmap bitmap;
+    Boolean hasLicence=false;
     RadioGroup licence;
-    Boolean hasLisence=false;
+
+    SQLiteHelper dbHelper;
+    SQLiteDatabase db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-
+        openDatabase();
+        setBitmap();
         onClickedRadioGroup();
         onTakePhotoClicked();
         onSubmitClicked();
@@ -42,6 +47,16 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
 
 
 
+    }
+
+    private void openDatabase(){
+        dbHelper=new SQLiteHelper(this);
+        db=dbHelper.getWritableDatabase();
+
+    }
+
+    public void setBitmap(){
+        bitmap= BitmapFactory.decodeResource(getResources(), R.drawable.user_base_img);
     }
 
     public void onTakePhotoClicked(){
@@ -64,17 +79,15 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
         licence.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
-                RadioButton checkedRadioButton = (RadioButton)radioGroup.findViewById(i);
-                // This puts the value (true/false) into the variable
-                boolean isChecked = checkedRadioButton.isChecked();
-
-                if(isChecked){
-                    if(checkedRadioButton.getText().toString().compareTo("YES")==0)
+                switch (i){
+                    case R.id.rb_yes:
                         hasLicence=true;
-
-                    else
+                        break;
+                    case R.id.rb_no:
                         hasLicence=false;
+                        break;
                 }
+
             }
         });
     }
@@ -99,23 +112,28 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
             String newAddress=address.getText().toString();
             if(newUsername.compareTo("")!=0&&newAddress.compareTo("")!=0&&newPassword.compareTo("")!=0&&newConfirnPassword.compareTo("")!=0) {
                 String newStringHasLicence;
-                if (hasLisence)
+                if (hasLicence)
                     newStringHasLicence = "1";
                 else
                     newStringHasLicence = "0";
                 byte[] newImg = BitmapHelper.getBytes(bitmap);
 
                 if (newPassword.compareTo(newConfirnPassword) == 0) {
-                    Intent intent = new Intent();
-
-                    intent.putExtra("newUsername", newUsername);
-                    intent.putExtra("newPassword", newPassword);
-                    intent.putExtra("newAddress", newAddress);
-                    intent.putExtra("newStringHasLicence", newStringHasLicence);
-                    intent.putExtra("newImg", newImg);
-                    setResult(RESULT_OK, intent);
-                    finish();
-                } else
+                    if(dbHelper.matchUsernameToPassword(db,newUsername,newPassword)!=-1){
+                        Toast.makeText(this,"Username is already exist",Toast.LENGTH_LONG).show();
+                    }else {
+                        Intent intent = new Intent();
+                        dbHelper.insert(db,newUsername,
+                                Integer.parseInt(newStringHasLicence),
+                                newAddress,
+                                newPassword,
+                                newImg);
+                        int id=dbHelper.matchUsernameToPassword(db,newUsername,newPassword);
+                        intent.putExtra("id", id+"");
+                        setResult(RESULT_OK, intent);
+                        finish();
+                    }
+                }else
                     Toast.makeText(this, "Different Passwords Entered", Toast.LENGTH_SHORT).show();
             }else
                 Toast.makeText(this,"Pleas Enter All Parameters",Toast.LENGTH_LONG).show();
@@ -140,4 +158,6 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
             }
         }
     }
+
+
 }

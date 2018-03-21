@@ -17,7 +17,8 @@
         android:id="@+id/rg_search_by"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="center">
 
 
         <RadioButton
@@ -25,28 +26,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Username"
-            android:textSize="15sp"
+            android:textSize="20sp"
             android:checked="true"/>
         <RadioButton
             android:id="@+id/rb_address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Address"
-            android:textSize="15sp"/>
+            android:textSize="20sp"/>
 
         <RadioButton
             android:id="@+id/rb_driving_licence"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="licence"
-            android:textSize="15sp"/>
+            android:textSize="20sp"/>
 
-        <RadioButton
-            android:id="@+id/rb_all"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Show All"
-            android:textSize="15sp"/>
 
     </RadioGroup>
     <!--

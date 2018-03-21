@@ -25,7 +25,7 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
     SQLiteDatabase db;
     private int USER_ID;
 
-    EditText userName, password, confirnPassword, address;
+    EditText userName, password, confirmPassword, address;
     Button takePhoto, submit, cancle,delete;
     ImageView imgPhoto;
     Bitmap bitmap;
@@ -142,20 +142,20 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
 
             userName=(EditText)findViewById(R.id.et_user_name);
             password=(EditText)findViewById(R.id.et_password);
-            confirnPassword=(EditText)findViewById(R.id.et_confirn_password);
+            confirmPassword=(EditText)findViewById(R.id.et_confirm_password);
             address=(EditText)findViewById(R.id.et_address);
             imgPhoto=(ImageView)findViewById(R.id.img_photo);
 
             String newUsername=userName.getText().toString();
             String newPassword=password.getText().toString();
-            String newConfirnPassword=confirnPassword.getText().toString();
+            String newConfirmPassword=confirmPassword.getText().toString();
             String newAddress=address.getText().toString();
 
             if(!newUsername.equals("")){
                 dbHelper.setUserNameColumn(db,newUsername,USER_ID);
             }
             if(!newPassword.equals("")){
-                if(newPassword.equals(newConfirnPassword)){
+                if(newPassword.equals(newConfirmPassword)){
                     dbHelper.setPasswordColumn(db,newPassword,USER_ID);
                 }else{
                     Toast.makeText(this, "Different Passwords Entered", Toast.LENGTH_SHORT).show();

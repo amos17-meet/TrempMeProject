@@ -26,7 +26,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     SQLiteDatabase db;
     SQLiteHelper dbHelper;
-    private int USER_ID;
+    private int USER_ID=-1;
 
     final int RESULT_DELETE=-2;
 
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         openDatabase();
-        goToLogIn();
+        chackUserId();
         maketUsersList(dbHelper.getAll(db));
         makeListView();
         onClickedRadioGroup();
@@ -55,6 +55,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
+    }
+
+    public void chackUserId(){
+        Log.w("DEBAG",USER_ID+"");
+        if(USER_ID==-1){
+            goToLogIn();
+        }
     }
 
     private void goToLogIn(){
@@ -77,6 +84,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(this, "Hellow " + dbHelper.getRowUserName(dbHelper.getQueryById(db, USER_ID)), Toast.LENGTH_LONG).show();
                 maketUsersList(dbHelper.getAll(db));
                 makeListView();
+            }
+            if(resultCode==RESULT_CANCELED){
+                chackUserId();
             }
         }
         if(requestCode==1){
@@ -137,10 +147,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     case R.id.rb_driving_licence:
                         searchBy="licence";
                         break;
-                    case R.id.rb_all:
-                        Cursor c=dbHelper.getAll(db);
-                        maketUsersList(c);
-                        makeListView();
                 }
             }
         });
@@ -215,36 +221,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
+
             }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 /*
+                String filter=charSequence.toString();
+                int count=charSequence.length();
                 Cursor c;
-
-                switch (searchBy){
-                    case "username":
-                        c=dbHelper.getQueryByUserName(db,charSequence.toString());
-                        maketUsersList(c);
-                        break;
-                    case "address":
-                        c=dbHelper.getQueryByAddress(db,charSequence.toString());
-                        maketUsersList(c);
-                        break;
-                    case "licence":
-                        c=dbHelper.getQueryByLicence(db,charSequence.toString().equals("1"));
-                        maketUsersList(c);
-                        break;
-                    case "all":
-                        Toast.makeText(MainActivity.this,"Choose search by option",Toast.LENGTH_LONG).show();
+                if(filter.toString().equals("")){
+                    c=dbHelper.getAll(db);
+                    maketUsersList(c);
+                }
+                else {
+                    switch (searchBy) {
+                        case "username":
+                            //c = dbHelper.getQueryByUserName(db, editable.toString());
+                            // maketUsersList(c);
+                            setUserListWhenSearch(filter);
+                            break;
+                        case "address":
+                            //c = dbHelper.getQueryByAddress(db, editable.toString());
+                            //maketUsersList(c);
+                            setUserListWhenSearch(filter);
+                            break;
+                        case "licence":
+                            c = dbHelper.getQueryByLicence(db, charSequence.toString().equals("1"));
+                            maketUsersList(c);
+                            break;
+                    }
 
                 }
                 makeListView();
                 */
+
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
+                /*
                 Cursor c;
                 if(editable.toString().equals("")){
                     c=dbHelper.getAll(db);
@@ -264,15 +280,87 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             c = dbHelper.getQueryByLicence(db, editable.toString().equals("1"));
                             maketUsersList(c);
                             break;
-                        case "all":
-                            Toast.makeText(MainActivity.this, "Choose search by option", Toast.LENGTH_LONG).show();
-
                     }
 
                 }
                 makeListView();
+                */
+                String filter=editable.toString();
+                int count=editable.length();
+                Cursor c;
+                if(filter.toString().equals("")){
+                    c=dbHelper.getAll(db);
+                    maketUsersList(c);
+                }
+                else {
+                    switch (searchBy) {
+                        case "username":
+                            //c = dbHelper.getQueryByUserName(db, editable.toString());
+                            // maketUsersList(c);
+                            setUserListWhenSearch(filter);
+                            break;
+                        case "address":
+                            //c = dbHelper.getQueryByAddress(db, editable.toString());
+                            //maketUsersList(c);
+                            setUserListWhenSearch(filter);
+                            break;
+                        case "licence":
+                            c = dbHelper.getQueryByLicence(db, editable.toString().equals("1"));
+                            maketUsersList(c);
+                            break;
+                    }
+
+                }
+                makeListView();
+
+
+
             }
         });
+    }
+
+    public void setUserListWhenSearch(String filter){
+        userList.clear();
+        int count=filter.length();
+        Cursor c=dbHelper.getAll(db);
+        if(searchBy.equals("username")){
+            while (!c.isAfterLast()){
+                String name=dbHelper.getRowUserName(c);
+                if(name.length()<count){
+                    c.moveToNext();
+                }else {
+                    if (name.substring(0, count).equals(filter)) {
+                        Bitmap userBitmap = BitmapHelper.getImage(dbHelper.getRowImage(c));
+                        userObject = new UserObject(dbHelper.getRowId(c),
+                                dbHelper.getRowUserName(c),
+                                dbHelper.getRowAddress(c),
+                                dbHelper.hasDrivingLicence(c),
+                                userBitmap);
+                        userList.add(userObject);
+                    }
+                    c.moveToNext();
+                }
+            }
+        }
+        if(searchBy.equals("address")){
+            while (!c.isAfterLast()){
+                String address=dbHelper.getRowAddress(c);
+                if(address.length()<count) {
+                    c.moveToNext();
+                }else {
+                    if (address.substring(0, count).equals(filter)) {
+                        Bitmap userBitmap = BitmapHelper.getImage(dbHelper.getRowImage(c));
+                        userObject = new UserObject(dbHelper.getRowId(c),
+                                dbHelper.getRowUserName(c),
+                                dbHelper.getRowAddress(c),
+                                dbHelper.hasDrivingLicence(c),
+                                userBitmap);
+                        userList.add(userObject);
+                    }
+                    c.moveToNext();
+                }
+            }
+        }
     }
 
 

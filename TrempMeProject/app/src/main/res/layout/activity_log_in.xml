@@ -11,18 +11,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        >
-        <Button
-            android:layout_marginLeft="200dp"
-            android:id="@+id/btn_to_sign_up"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sign Up"
-            android:textSize="30sp"/>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical">
         <LinearLayout
@@ -58,15 +46,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:hint="Enter Here"
-                android:textSize="25sp" />
+                android:textSize="25sp"
+                />
         </LinearLayout>
 
         <Button
-            android:id="@+id/btn_submit"
+            android:id="@+id/btn_login"
             android:layout_marginTop="40dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Submit"
+            android:text="Log In"
             android:textSize="30sp"/>
 
     </LinearLayout>

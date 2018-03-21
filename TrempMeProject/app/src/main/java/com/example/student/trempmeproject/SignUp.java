@@ -22,7 +22,7 @@ import static java.security.AccessController.getContext;
 
 
 public class SignUp extends AppCompatActivity implements View.OnClickListener {
-    EditText userName, password, confirnPassword, address;
+    EditText userName, password, confirmPassword, address;
     Button takePhoto, submit, cancle;
     ImageView imgPhoto;
     Bitmap bitmap;
@@ -102,15 +102,15 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
 
             userName=(EditText)findViewById(R.id.et_user_name);
             password=(EditText)findViewById(R.id.et_password);
-            confirnPassword=(EditText)findViewById(R.id.et_confirn_password);
+            confirmPassword=(EditText)findViewById(R.id.et_confirm_password);
             address=(EditText)findViewById(R.id.et_address);
             imgPhoto=(ImageView)findViewById(R.id.img_photo);
 
             String newUsername=userName.getText().toString();
             String newPassword=password.getText().toString();
-            String newConfirnPassword=confirnPassword.getText().toString();
+            String newConfirmPassword=confirmPassword.getText().toString();
             String newAddress=address.getText().toString();
-            if(newUsername.compareTo("")!=0&&newAddress.compareTo("")!=0&&newPassword.compareTo("")!=0&&newConfirnPassword.compareTo("")!=0) {
+            if(newUsername.compareTo("")!=0&&newAddress.compareTo("")!=0&&newPassword.compareTo("")!=0&&newConfirmPassword.compareTo("")!=0) {
                 String newStringHasLicence;
                 if (hasLicence)
                     newStringHasLicence = "1";
@@ -118,7 +118,7 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
                     newStringHasLicence = "0";
                 byte[] newImg = BitmapHelper.getBytes(bitmap);
 
-                if (newPassword.compareTo(newConfirnPassword) == 0) {
+                if (newPassword.compareTo(newConfirmPassword) == 0) {
                     if(dbHelper.matchUsernameToPassword(db,newUsername,newPassword)!=-1){
                         Toast.makeText(this,"Username is already exist",Toast.LENGTH_LONG).show();
                     }else {

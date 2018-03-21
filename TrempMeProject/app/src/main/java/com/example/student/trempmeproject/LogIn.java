@@ -5,6 +5,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,7 +16,7 @@ import android.widget.Toast;
 
 public class LogIn extends AppCompatActivity implements View.OnClickListener {
     EditText tvUserName, tvPassword;
-    Button btnSubmit, btnGoToSignUp;
+    Button btnLogin, btnGoToSignUp;
 
     SQLiteHelper dbHelper;
     SQLiteDatabase db;
@@ -23,7 +26,6 @@ public class LogIn extends AppCompatActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log_in);
         onSubmitclicked();
-        goToSignUp();
         openDatabase();
     }
 
@@ -35,16 +37,13 @@ public class LogIn extends AppCompatActivity implements View.OnClickListener {
     public void onSubmitclicked(){
         tvUserName=(EditText)findViewById(R.id.et_user_name);
         tvPassword=(EditText)findViewById(R.id.et_password);
-        btnSubmit=(Button)findViewById(R.id.btn_submit);
+        btnLogin=(Button)findViewById(R.id.btn_login);
 
-        btnSubmit.setOnClickListener(this);
+        btnLogin.setOnClickListener(this);
     }
 
 
-    public void goToSignUp(){
-        btnGoToSignUp=(Button) findViewById(R.id.btn_to_sign_up);
-        btnGoToSignUp.setOnClickListener(this);
-    }
+
 
     @Override
     public void onClick(View view) {
@@ -52,7 +51,7 @@ public class LogIn extends AppCompatActivity implements View.OnClickListener {
                 Intent intent=new Intent(this,SignUp.class);
                 startActivityForResult(intent,0);
         }
-        if (view==btnSubmit){
+        if (view==btnLogin){
 
             int id=dbHelper.matchUsernameToPassword(db,tvUserName.getText().toString(),tvPassword.getText().toString());
             if(id!=-1){
@@ -80,6 +79,25 @@ public class LogIn extends AppCompatActivity implements View.OnClickListener {
                 finish();
             }
         }
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.log_in_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.sign_up:
+                Intent intent = new Intent(LogIn.this, SignUp.class);
+                startActivityForResult(intent,0);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
